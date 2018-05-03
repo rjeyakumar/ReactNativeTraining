@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Currency Conversion</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body></body>
+<script>
+    function* exchangeRate(from, to, amount) {
+        const URL = `https://api.fixer.io/latest?base=${from}`;
+        yield axios.get(URL).then((response) => {
+            const currencyRate = response.data.rates[to];
+            return currencyRate * amount;
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    const rate = exchangeRate('USD', 'INR', 500).next();
+    rate.value.then((data) => {
+        console.log('CurrencyValue:', data);
+    });
+</script>
+
+</html>
