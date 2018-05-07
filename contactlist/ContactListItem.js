@@ -17,9 +17,8 @@ const styles = StyleSheet.create({
     backgroundColor: "lightblue",
     marginRight: 10,
     marginLeft: 10,
-    marginBottom: 10
+    marginBottom: 10,
   }
-
 });
 
 export default ContactListItem;
