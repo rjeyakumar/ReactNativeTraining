@@ -55,7 +55,7 @@ class AddProduct extends Component {
     return this.state.categories.map(c => <Picker.Item key={c} label={c} value={c} />)
   }
 
-  renderAddForm = () => (<View style={styles.container}>
+  renderAddForm = () => (<View>
     <TextInput
       style={styles.control}
       onChangeText={(title) => {

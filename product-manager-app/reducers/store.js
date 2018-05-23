@@ -4,7 +4,7 @@ import {
     GET_STORES_SUCCESS
 } from "../actionTypes/store";
 
-export default (prevState={stores:[],isLoading:false}, action) => {
+export default (prevState={stores:[],isLoading: false}, action) => {
     switch (action.type) {
         case GET_STORES:
             return { ...prevState,

@@ -10,8 +10,9 @@ import ProductDetail from "./ProductDetail";
 import AddProduct from "./AddProduct";
 import SearchList from "./SearchList";
 import StoreMap from "./StoreMap";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons"
+import { Ionicons, MaterialIcons, FontAwesome } from "@expo/vector-icons"
 import ProductListWithFlatList from "./ProductListWithFlatList";
+import AdminProductList from "./AdminProductList";
 
 const ListStack = createStackNavigator(
   {
@@ -43,7 +44,7 @@ const SearchStack = createStackNavigator(
     SearchList: {
       screen: SearchList
     },
-    Detail: {
+    SearchProductDetail: {
       screen: ProductDetail
     }
   },
@@ -85,12 +86,38 @@ const AddStack = createStackNavigator(
   }
 );
 
+const AdminStack = createStackNavigator(
+  {
+    AdminProducts: {
+      screen: AdminProductList
+    },
+    AdminDetail: {
+      screen: ProductDetail
+    }
+  },
+  {
+    initialRouteName: "AdminProducts",
+    navigationOptions: {
+      title: "Admin",
+      headerStyle: {
+        backgroundColor: "#00ff80"
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        fontWeight: "bold",
+        textAlign: "center"
+      }
+    }
+  }
+);
+
 export const AppNavigator = createBottomTabNavigator(
   {
     List: ListStack,
     Add: AddStack,
     Search: SearchStack,
-    Stores: StoreMap
+    Stores: StoreMap,
+    Admin: AdminStack,
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -111,7 +138,14 @@ export const AppNavigator = createBottomTabNavigator(
               color={tintColor}
             />
           );
-        }
+        }else if (routeName === "Admin") {
+          return (
+            <FontAwesome
+              name="user"
+              size={25}
+              color={tintColor}
+            />);
+        } 
 
         // You can return any component that you like here! We usually use an
         // icon component from react-native-vector-icons

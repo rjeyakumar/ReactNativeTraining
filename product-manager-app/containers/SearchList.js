@@ -29,28 +29,22 @@ class SearchList extends Component {
     const { searchProducts, resetProducts } = this.props.actions;
     this.setState({ searchText: text }, () => {
       const { searchText } = this.state;
-      if (searchText && searchText.length > 2) {
-        resetProducts();
-        searchProducts(searchText, this.props.page, this.props.limit);
-      }
+      searchProducts(searchText, 1, this.props.limit);
     });
 
   }
 
   onWishTapped = id => {
     const { actions } = this.props;
-    actions.addToWishList(id);
+    actions.addSearchProductToWishList(id);
   };
 
   _getMore = () => {
-    console.log(this.props);
     const { actions, page, limit } = this.props;
     const { searchText } = this.state;
-    const pageNumber = page + 1;
-    actions.searchProducts(searchText, pageNumber, limit);
+    const pageNo = page + 1;
+    actions.searchProducts(searchText, pageNo, limit);
   };
-
-  /*  flat list supporting methods - END */
 
   render() {
     const { products, navigation, isLoading } = this.props;
@@ -67,11 +61,13 @@ class SearchList extends Component {
         </View>
         <View style={{ flex: 1 }}>
           <ProductList
+            config={{ enableWish: true }}
             navigation={navigation}
             isLoading={isLoading}
             products={products}
             onWishTapped={this.onWishTapped}
             getMore={this._getMore}
+            type="search"
           />
         </View>
       </View>
@@ -113,17 +109,17 @@ const styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    products: state.productState.products,
-    isLoading: state.productState.isLoading,
-    isRefreshing: state.productState.isRefreshing,
-    page: state.productState.page,
-    limit: state.productState.limit
+    products: state.searchState.products,
+    isLoading: state.searchState.isLoading,
+    isRefreshing: state.searchState.isRefreshing,
+    page: state.searchState.page,
+    limit: state.searchState.limit
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(searchProductsActionCreator, dispatch)
+    actions: bindActionCreators(searchProductsActionCreator, dispatch),
   };
 }
 

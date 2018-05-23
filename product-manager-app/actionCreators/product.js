@@ -4,7 +4,9 @@ import {
     GET_PRODUCTS_FAILURE,
     ADD_TO_WISH,
     ADD_PRODUCT_TO_WISH,
-    RESET_PRODUCTS
+    DELETE_PRODUCT,
+    DELETE_PRODUCT_SUCCESS,
+    DELETE_PRODUCT_FAILURE,
 } from "../actionTypes/product";
 
 export function getProducts(page, limit) {
@@ -29,17 +31,39 @@ export function getProductsFailure(error) {
     }
 }
 
-export function addToWishList(id) {
+export function deleteProduct(id, selectedIndex) {
     return {
-        type: ADD_TO_WISH,
-        id
+        type: DELETE_PRODUCT,
+        id,
+        selectedIndex,
     }
 }
 
-export function addProductToWishList(products, id) {
+export function deleteProductSuccess(index) {
+    return {
+        type: DELETE_PRODUCT_SUCCESS,
+        index,
+    }
+}
+
+export function deleteProductFailure() {
+    return {
+        type: DELETE_PRODUCT_FAILURE,
+    }
+}
+
+// export function addToWishList(products, id) {
+//     return {
+//         type: ADD_TO_WISH,
+//         id,
+//         products,
+//     }
+// }
+//addProductToWishList
+
+export function addToWishList(id) {
     return {
         type: ADD_PRODUCT_TO_WISH,
-        products,
         id,
     }
 }

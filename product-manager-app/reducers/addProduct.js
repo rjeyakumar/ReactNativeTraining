@@ -14,6 +14,7 @@ export default (prevState = initialState, action) => {
             return {
                 ...prevState,
                 isLoading: true,
+                isProductAdded: false,
             }
         case ADD_PRODUCT_SUCCESS:
             return {

@@ -4,6 +4,7 @@ import {
 import productReducer from "./product";
 import detailsReducer from "./productDetails";
 import addProductReducer from "./addProduct";
+import search from "./search";
 import storeReducer from "./store"
 import {
     createNavigationReducer
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     productState: productReducer,
     detailsState: detailsReducer,
     addProductState: addProductReducer,
+    searchState: search,
     storeState: storeReducer,
     navState: navReducer
 })

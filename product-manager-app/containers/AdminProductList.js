@@ -5,6 +5,7 @@ import {
   FlatList,
   RefreshControl,
   Alert,
+  Vibration,
   View
 } from "react-native";
 
@@ -12,8 +13,9 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import ProductList from '../components/ProductList';
 import * as productActionCreators from "../actionCreators/product";
-let URI = "http://172.16.101.225:4000";
-class ProductListWithFlatList extends Component {
+
+const DURATION = 1000;
+class AdminProductList extends Component {
   constructor(props) {
     super(props);
   }
@@ -22,19 +24,35 @@ class ProductListWithFlatList extends Component {
     this._getProducts();
   }
 
-  onWishTapped = id => {
+  componentDidUpdate(prevprops) {
+    const { isDeleted } = this.props;
+    if (prevprops.isDeleted !== isDeleted && isDeleted) {
+      Alert.alert('Success', 'Product Deleted Successfully');
+      Vibration.vibrate(DURATION);
+    }
+  }
+
+  onDeleteTapped = (id, index) => {
     const { actions } = this.props;
-    actions.addToWishList(id);
+    Alert.alert(
+      'Delete',
+      'Are you sure to delete?',
+      [
+        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        { text: 'OK', onPress: () => actions.deleteProduct(id, index) },
+      ],
+      { cancelable: false }
+    );
   };
 
   _getProducts = (page = 1, limit = 8) => {
-    this.props.actions.getProducts(page, limit);
+    const { actions } = this.props;
+    actions.getProducts(page, limit);
   };
 
   _getMore = () => {
     this._getProducts(++this.props.page, this.props.limit);
   };
-
 
   _onRefresh = () => {
     this._getProducts();
@@ -47,13 +65,14 @@ class ProductListWithFlatList extends Component {
           <ActivityIndicator size="large" color="#00ff80" />
         ) : (
             <ProductList
-              config={{enableWish: true}}
+              config={{ enableDelete: true }}
               navigation={this.props.navigation}
               onRefresh={this._onRefresh}
               products={this.props.products}
-              onWishTapped={this.onWishTapped}
+              onDeleteTapped={this.onDeleteTapped}
               getMore={this._getMore}
               isRefreshing={this.props.isRefreshing}
+              type="admin"
             />
           )}
       </View>
@@ -62,12 +81,14 @@ class ProductListWithFlatList extends Component {
 }
 
 function mapStateToProps(state) {
+  const { products, isLoading, isRefreshing, page, limit, isDeleted } = state.productState;
   return {
-    products: state.productState.products,
-    isLoading: state.productState.isLoading,
-    isRefreshing: state.productState.isRefreshing,
-    page: state.productState.page,
-    limit: state.productState.limit
+    products,
+    isLoading,
+    isRefreshing,
+    page,
+    limit,
+    isDeleted,
   };
 }
 
@@ -78,5 +99,5 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  ProductListWithFlatList
+  AdminProductList
 );

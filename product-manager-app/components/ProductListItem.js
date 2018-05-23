@@ -11,28 +11,44 @@ import {
   Alert
 } from "react-native";
 
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
 class ProductListItem extends React.PureComponent {
-  
+
+  navigateHandler = () => {
+    const { id, navigation, type } = this.props;
+    let URL;
+    switch (type) {
+      case 'search':
+        URL = 'SearchProductDetail';
+        break;
+      case 'admin':
+        URL = 'AdminDetail';
+        break;
+      default:
+        URL = 'Detail';
+    }
+    navigation.navigate(URL, { id });
+  }
+
   render() {
-    let {
+    const {
       id,
       image,
       title,
-      navigation,
       price,
       rating,
-      wish = true,
-      onWishTapped
+      wish,
+      onWishTapped,
+      onDeleteTapped,
+      config,
+      index,
     } = this.props;
+    const { enableDelete, enableWish } = config;
     return (
       <TouchableOpacity
         activeOpacity={0.5}
-        onPress={() => {
-          console.log("Navigating to detail for id ", id);
-          navigation.navigate("Detail", { id });
-        }}
+        onPress={this.navigateHandler}
       >
         <View style={styles.container}>
           <Image
@@ -48,14 +64,22 @@ class ProductListItem extends React.PureComponent {
                 {title}
               </Text>
 
-              <Ionicons
+              {enableWish && <Ionicons
                 name={wish ? "md-heart" : "md-heart-outline"}
                 size={32}
                 color="#00ff80"
                 style={{ marginRight: 10 }}
                 hitSlop={{ top: 40, left: 40, right: 40, bottom: 40 }}
                 onPress={() => onWishTapped(id)}
-              />
+              />}
+              {enableDelete && <MaterialIcons
+                name={"delete"}
+                size={32}
+                color="red"
+                style={{ marginRight: 10 }}
+                hitSlop={{ top: 40, left: 40, right: 40, bottom: 40 }}
+                onPress={() => onDeleteTapped(id, index)}
+              />}
             </View>
             <View style={styles.rating}>
               <Text style={{ color: "#fff", marginRight: 4 }}>{rating || "NA"}</Text>
@@ -96,7 +120,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: "row",
     paddingTop: 20,
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
   },
   rating: {
     borderRadius: 5,

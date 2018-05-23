@@ -5,7 +5,8 @@ import {
   FlatList,
   RefreshControl,
   Alert,
-  View
+  View,
+  Text,
 } from "react-native";
 
 let URI = "http://172.16.101.225:4000";
@@ -16,16 +17,18 @@ export default class ProductList extends Component {
   }
 
   _renderItem = ({ index, item }) => {
+    const { onWishTapped } = this.props;
     return (
       <ProductListItem
         {...this.props}
         id={item.id}
+        index={index}
         title={`${item.id} - ${item.title}`}
         image={item.image ? `${URI}/images/${item.image}` : null}
         rating={item.rating}
         price={item.price}
         wish={item.wish || false}
-        onWishTapped={this.props.onWishTapped}
+        onWishTapped={onWishTapped}
       />
     );
   };
@@ -35,10 +38,11 @@ export default class ProductList extends Component {
   };
 
   _renderRefreshControl() {
+    const { isRefreshing } = this.props;
     return (
       <RefreshControl
         onRefresh={this._onRefresh}
-        refreshing={this.props.isRefreshing}
+        refreshing={isRefreshing}
         tintColor={"#00ff80"}
         title={"Refreshing..."}
         titleColor={"#00ff80"}
@@ -49,20 +53,22 @@ export default class ProductList extends Component {
   /*  flat list supporting methods - END */
 
   render() {
-    const { onRefresh } = this.props;
+    const { onRefresh, getMore, products, isLoading } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        {this.props.isLoading ? (
+        {isLoading ? (
           <ActivityIndicator size="large" color="#00ff80" />
         ) : (
-            <FlatList
-              data={this.props.products}
+            products.length > 0 ? <FlatList
+              data={products}
               renderItem={this._renderItem}
               keyExtractor={this._keyExtractor}
               onEndReachedThreshold={0.5}
-              onEndReached={this.props._getMore}
+              onEndReached={getMore}
               refreshControl={onRefresh ? this._renderRefreshControl() : null}
-            />
+            /> : <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <Text>No Results</Text>
+              </View>
           )}
       </View>
     );

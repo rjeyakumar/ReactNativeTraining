@@ -4,12 +4,12 @@ import {
     select,
     throttle,
 } from "redux-saga/effects";
-import * as actionCreators from "../actionCreators/product"
-import * as detailsActionCreators from "../actionCreators/productDetails"
-import * as addProductActionCreators from "../actionCreators/addProduct"
-import { productsSelector } from './selectors';
+import * as actionCreators from "../actionCreators/product";
+import * as detailsActionCreators from "../actionCreators/productDetails";
+import * as addProductActionCreators from "../actionCreators/addProduct";
+import * as searchProductActionCreators from "../actionCreators/search";
 import {
-    GET_PRODUCTS, ADD_PRODUCT, GET_PRODUCT_DETAILS, ADD_TO_WISH, SEARCH_PRODUCTS,
+    GET_PRODUCTS, ADD_PRODUCT, GET_PRODUCT_DETAILS, ADD_TO_WISH, SEARCH_PRODUCTS, DELETE_PRODUCT,
 } from "../actionTypes/product";
 import { takeEvery } from "redux-saga";
 
@@ -32,28 +32,28 @@ function* getProductDetails(action) {
         yield put(detailsActionCreators.getProductDetailsFailure(error))
     }
 }
-// function* getProduct(action) {
-//     try {
-//         let product = yield fetch(`${URI}\product\${action.id}`).then(r => r.json());
-//         yield put(actionCreators.getProductSuccess(product))
-//     } catch (error) {
-//         yield put(actionCreators.getProductFailure(error))
-//     }
-// }
 
 function* searchProducts(action) {
     try {
-        let productDetails = yield fetch(`${URI}/products?q=${action.searchText}&_page=${action.page}&_limit=${action.limit}`).then(r => r.json());
-        yield put(actionCreators.getProductsSuccess(productDetails))
+        let products = yield fetch(`${URI}/products?q=${action.searchText}&_page=${action.page}&_limit=${action.limit}`).then(r => r.json());
+        yield put(searchProductActionCreators.getsearchProductsSuccess(products))
     } catch (error) {
-        yield put(actionCreators.getProductsFailure(error))
+        yield put(searchProductActionCreators.getsearchProductsFailure(error))
     }
 }
 
-function* addToWishList(action) {
-    const products = yield select(productsSelector);
-    yield put(actionCreators.addProductToWishList(products, action.id));
+function* deleteProducts(action) {
+    try {
+        let products = yield fetch(`${URI}/products/${action.id}`, { method: 'DELETE', }).then(r => r.json());
+        yield put(actionCreators.deleteProductSuccess(action.selectedIndex))
+    } catch (error) {
+        yield put(actionCreators.deleteProductFailure(error))
+    }
 }
+
+// function* addToWishList(action) {
+//     yield put(actionCreators.addProductToWishList(action.id));
+// }
 
 function* addProduct(action) {
     try {
@@ -73,7 +73,8 @@ function* addProduct(action) {
 export function* productWatchers() {
     yield [takeLatest(GET_PRODUCTS, getProducts),
     takeLatest(GET_PRODUCT_DETAILS, getProductDetails),
-    takeEvery(ADD_TO_WISH, addToWishList),
+    //takeEvery(ADD_TO_WISH, addToWishList),
     takeEvery(ADD_PRODUCT, addProduct),
-    throttle(1000, SEARCH_PRODUCTS, searchProducts),]
+    throttle(1000, SEARCH_PRODUCTS, searchProducts),
+    takeLatest(DELETE_PRODUCT, deleteProducts),]
 }

@@ -1,44 +1,36 @@
 import React, { Component } from "react";
+import {
+  ActivityIndicator,
+  View,
+} from "react-native";
 import { MapView } from "expo";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as storeActionCreator from "../actionCreators/store";
 
 class StoreMap extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      stores: [
-        {
-          latitude: 13.019995,
-          longitude: 80.185405,
-          title: "Bay Store",
-          id: "s1"
-        },
-        {
-            latitude: 13.040172,
-            longitude: 80.184968,
-            title: "Pep Store",
-            id: "s2"
-        },
-        {
-            latitude: 12.990172,
-            longitude: 80.183968,
-            title: "Dry Store",
-            id: "s3"
-          }
-      ]
-    };
   }
-  render() {
+
+  componentDidMount() {
+    this.props.actions.getStores();
+  }
+
+  renderMapView = () => {
+    const { stores } = this.props;
+    console.log(stores);
     return (
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
-          latitude: this.state.stores[0].latitude,
-          longitude: this.state.stores[0].longitude,
+          latitude: stores[0].latitude,
+          longitude: stores[0].longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421
         }}
       >
-       {this.state.stores.map(s => (<MapView.Marker
+        {stores.map(s => (<MapView.Marker
           coordinate={{
             latitude: s.latitude,
             longitude: s.longitude
@@ -46,10 +38,36 @@ class StoreMap extends Component {
           title={s.title}
           key={s.id}
         />
-      ))}
+        ))}
       </MapView>
+    );
+  }
+  render() {
+    const { isLoading, stores } = this.props;
+    return (
+      <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#00ff80" />
+        ) : stores.length > 0 && this.renderMapView()
+        }
+      </View>
     );
   }
 }
 
-export default StoreMap;
+function mapStateToProps(state) {
+  return {
+    stores: state.storeState.stores,
+    isLoading: state.storeState.isLoading,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(storeActionCreator, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+  StoreMap
+);
